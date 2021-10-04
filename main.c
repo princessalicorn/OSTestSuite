@@ -4,10 +4,12 @@
 #include <time.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <string.h>
 
 #ifndef MAX_BUF
 #define MAX_BUF 1024
 #endif // MAX_BUF
+
 
 void foldertest()
 {
@@ -69,14 +71,23 @@ void rwtest()
 
     fprintf(fp, "\n");
     double eltimetest3 = 0.0;
-    clock_t begin = clock();
-    system("dd if=/dev/random of=rwtestrandom bs=1GB count=1");
-    system("cat rwtestrandom");
-    clock_t end = clock();
-    eltimetest3 += (double)(end - begin) / CLOCKS_PER_SEC;
-    system("rm rwtestrandom");
+    clock_t begin3 = clock();
+    //system("dd if=/dev/urandom of=rwtestrandom bs=64M count=16 iflag=fullblock");
+    FILE *onegigwrite;
+    onegigwrite = fopen("/home/amelia/1gtestwritefile", "w+");
+    size_t i = 0;
+    while (i < 1000000000)
+    {
+        int rngnum = rand() % 10;
+        char charnum = rngnum - '0';
+        fprintf(onegigwrite, &charnum);
+        i++;
+    }
+    clock_t end3 = clock();
+    eltimetest3 += (double)(end3 - begin3) / CLOCKS_PER_SEC;
+    //system("rm /home/amelia/1gtestwritefile");
 
-    fprintf(fp, "Disk Read/Write Test (1GB\n)");
+    fprintf(fp, "Disk Read/Write Test (1.8GB)\n");
     fprintf(fp, "Elapsed time: %f seconds\n", eltimetest3);
 
 }
@@ -102,5 +113,6 @@ int main()
         else
         {
             printf("You did not input a valid response, please try again! ");
+            return -1;
         }
 }
