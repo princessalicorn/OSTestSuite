@@ -6,55 +6,74 @@
 #include <sys/types.h>
 #include <string.h>
 
+#ifndef PATH //MADE A CONSTANT VARIABLE FOR PATH
+#define PATH "/home/amelia/testdir/"
+#endif // PATH
+
 #ifndef MAX_BUF
 #define MAX_BUF 1024
 #endif // MAX_BUF
-
 
 void foldertest()
 {
     /*Nessecary code for this part of the program*/
     FILE *fp;
-    system("touch /home/amelia/results.txt"); //MAKE A CONSTANT VARIABLE FOR PATH!!!
-    fp = fopen("/home/amelia/results.txt", "w+"); //MAKE A CONSTANT VARIABLE FOR PATH!!!
+    char buf[BUFSIZ];
+
+    const char* resultspath = PATH "results.txt";
+    snprintf(buf, sizeof(buf), "touch %s", resultspath);
+    system(buf);
+
+
+    fp = fopen(resultspath, "w+");
 
     /*One folder... hmmmm*/
     fprintf(fp, "Results for Making 1 Folder:\n");
     struct stat st = {0};
     if (stat("test", &st) == 1)
-    { //MAKE A CONSTANT VARIABLE FOR PATH!!!
-        system("rm -rf test"); //rewrite this in C
+    {
+        snprintf(buf, sizeof(buf), "rm", resultspath);
+        system(buf); // Rewrite in C
     }
+
     double eltimetest1 = 0.0;
     clock_t begin = clock(); //Do the fun!
-    mkdir("test", 777); //add ifdef for non linux systems to not include 777
+    char dirbuf[BUFSIZ];
+    const char* testdir = PATH "testdir/";
+    printf("%s\n", testdir);
+    mkdir(testdir, 777); //add ifdef for non linux systems to not include 777
     clock_t end = clock();
+
     eltimetest1 += (double)(end - begin) / CLOCKS_PER_SEC;
 
     fprintf(fp, "Elapsed time: %f seconds\n", eltimetest1);
 
-    system("rm -rf test"); //rewrite this in C
+    snprintf(dirbuf, sizeof(buf), "rm -rf %s", testdir);
+    //system(dirbuf);
 
     /*OH SHIT!!?!? 100 FOLDERS????*/
     fprintf(fp, "Results for Making 100 Folders:\n");
-    int i = 0;
+    int i;
     double eltimetest2 = 0.0;
     clock_t begin2 = clock();
-    while (i <= 100)
+    for (i = 0; i <= 100; i++)
     {
-        char filename1 = ("%d", i);
-        mkdir(filename1, 777);
-        i++;
+        chdir(PATH);
+        char filename1 = i - '0';
+        snprintf(dirbuf, sizeof(buf), "mkdir %s%d", testdir, i);
+        system(dirbuf);
     }
     clock_t end2 = clock();
     eltimetest2 += (double)(end2 - begin2) / CLOCKS_PER_SEC;
     fprintf(fp, "Elapsed time: %f seconds\n", eltimetest2);
 
     i = 0;
+    chdir(PATH);
     while (i <= 100)
     {
-        char filename2 = ("%d", i);
-        rmdir(filename2);
+        char filename2 = i - '0';
+        snprintf(dirbuf, sizeof(buf), "rm -rf %s%d", testdir, i);
+        system(dirbuf);
         i++;
     }
 
@@ -103,12 +122,18 @@ int main()
         {
             foldertest();
             printf("Folder Writing Test Complete!");
-            rwtest();
+            //rwtest();
 
         }
         else if(initans == 'n' || initans == 'N')
         {
             return 0;
+        }
+         else if(initans == 'd' || initans == 'D')
+        {
+            printf("%s", PATH);
+            const char* resultspath = PATH "results.txt";
+            printf("%s", resultspath);
         }
         else
         {
