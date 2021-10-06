@@ -86,7 +86,8 @@ void foldertest()
 void rwtest()
 {
     FILE *fp;
-    fp = fopen("/home/amelia/results.txt", "a+");
+    const char* resultspath = PATH "results.txt";
+    fp = fopen(resultspath, "a+");
 
     fprintf(fp, "\n");
     double eltimetest3 = 0.0;
