@@ -91,63 +91,63 @@ void foldertest()
 
 void rwtest()
 {
-    char buf[BUFSIZ];
-    FILE *fp;
-    const char* resultspath = PATH "results.txt";
-    fp = fopen(resultspath, "a+");
-    FILE *onegigwrite;
-    const char* onegigwrpath = PATH "1gtestwritefile";
-    fprintf(fp, "\n");
-    double eltimetest3 = 0.0;
-    clock_t begin3 = clock();
-    //system("dd if=/dev/urandom of=rwtestrandom bs=64M count=16 iflag=fullblock");
+  char buf[BUFSIZ];
+  FILE *fp;
+  const char *resultspath = PATH "results.txt";
+  fp = fopen(resultspath, "a+");
+  FILE *onegigwrite;
+  const char *onegigwrpath = PATH "1gtestwritefile";
+  fprintf(fp, "\n");
+  double eltimetest3 = 0.0;
+  clock_t begin3 = clock();
+  // system("dd if=/dev/urandom of=rwtestrandom bs=64M count=16
+  // iflag=fullblock");
 
-    onegigwrite = fopen(onegigwrpath, "w+");
-    size_t i = 0;
-    while (i < 1000000000)
-    {
-        int rngnum = rand() % 10;
-        char charnum = rngnum - '0';
-        fprintf(onegigwrite, &charnum);
-        i++;
-    }
-    clock_t end3 = clock();
-    eltimetest3 += (double)(end3 - begin3) / CLOCKS_PER_SEC;
+  onegigwrite = fopen(onegigwrpath, "w+");
+  size_t i = 0;
+  while (i < 1000000000)
+  {
+    int rngnum = rand() % 10;
+    char charnum = rngnum - '0';
+    fprintf(onegigwrite, &charnum);
+    i++;
+  }
+  clock_t end3 = clock();
+  eltimetest3 += (double)(end3 - begin3) / CLOCKS_PER_SEC;
 
-    snprintf(buf, sizeof(buf), "rm", onegigwrpath);
-    system(buf);
+  snprintf(buf, sizeof(buf), "rm %s", onegigwrpath);
+  system(buf);
 
-    fprintf(fp, "Disk Read/Write Test (1.8GB)\n");
-    fprintf(fp, "Elapsed time: %f seconds\n", eltimetest3);
+  fprintf(fp, "Disk Read/Write Test (1.8GB)\n");
+  fprintf(fp, "Elapsed time: %f seconds\n", eltimetest3);
 }
 
 int main()
 {
-    char path[MAX_BUF];
-    char initans;
-    getcwd(path, MAX_BUF);
-    printf("Your current working directory is %s, do you wish to continue y/n? Note this operation will temporarily take numerous gigabytes of space! ", path);
-        scanf("%c", &initans);
-        if(initans == 'y' || initans == 'Y')
-        {
-            foldertest();
-            printf("Folder Writing Test Complete!");
-            //rwtest();
+  char path[MAX_BUF];
+  char initans;
+  chdir(PATH);
+  getcwd(path, MAX_BUF);
+  printf("Your current working directory is %s, do you wish to continue y/n? Note this operation will temporarily take numerous gigabytes of space! ", path);
+  scanf("%c", &initans);
+  if (initans == 'y' || initans == 'Y')
+  {
+    foldertest();
+    printf("Folder Writing Test Complete!\n");
+    rwtest();
+    printf("Random R/W Test Complete!\n");
 
-        }
-        else if(initans == 'n' || initans == 'N')
-        {
-            return 0;
-        }
-        else if(initans == 'd' || initans == 'D')
-        {
-            printf("%s", PATH);
-            const char* resultspath = PATH "results.txt";
-            printf("%s", resultspath);
-        }
-        else
-        {
-            printf("You did not input a valid response, please try again! ");
-            return -1;
-        }
+  } else if (initans == 'n' || initans == 'N')
+  {
+    return 0;
+  } else if (initans == 'd' || initans == 'D')
+  {
+    printf("%s", PATH);
+    const char *resultspath = PATH "results.txt";
+    printf("%s", resultspath);
+  } else
+  {
+    printf("You did not input a valid response, please try again! ");
+    return -1;
+  }
 }
