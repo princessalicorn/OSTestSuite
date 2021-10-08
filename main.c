@@ -4,6 +4,8 @@ Purpose: Abstractly testing operating system performance using various abstract
 metrics in POSIX Version: In Development
 */
 
+#include <libcob.h> //Note I had to add #include <stddef.h> in the header file
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -12,8 +14,10 @@ metrics in POSIX Version: In Development
 #include <time.h>
 #include <unistd.h>
 
+extern int say(char *hello, char *world);
+
 #ifndef PATH // MODIFY THIS TO WHATEVER DIRECTORY YOU WANT THE TESTS TO TAKE IN
-#define PATH "/home/amelia/testdir/"
+#define PATH "/tmp/"
 #endif // PATH
 #ifndef MAX_BUF
 #define MAX_BUF 1024
@@ -41,7 +45,7 @@ void foldertest() {
   double eltimetest1 = 0.0;
   clock_t begin = clock(); // Do the fun!
   char dirbuf[BUFSIZ];
-  const char *testdir = PATH "testdir/";
+  const char *testdir = PATH;
   printf("%s\n", testdir);
   mkdir(testdir, 777); // add ifdef for non linux systems to not include 777
   clock_t end = clock();
@@ -115,14 +119,27 @@ void rwtest() {
 }
 
 void dbtest() {
-  char contans;
-  printf("Do you want to conduct database testing? This will likely require a "
-         "COBOL compiler!");
-  scanf("%c", &contans);
+  /*Nessecary code for this part of the program*/
+  FILE *fp;
+  char buf[BUFSIZ];
+  int ret;
+  char hello[6] = "Hello ";
+  char world[6] = "World!";
+
+  cob_init(0, NULL);
+
+  ret = say(hello, world);
+
+  const char *resultspath = PATH "results.txt";
+  fp = fopen(resultspath, "w+");
+
+  // return ret;
 }
+
 int main() {
   char path[MAX_BUF];
   char initans;
+  char contans;
   chdir(PATH);
   getcwd(path, MAX_BUF);
   printf("Your current working directory is %s, do you wish to continue y/n?",
@@ -133,6 +150,7 @@ int main() {
     printf("Folder Writing Test Complete!\n");
     rwtest();
     printf("Random R/W Test Complete!\n");
+    dbtest();
 
   } else if (initans == 'n' || initans == 'N') {
     return 0;

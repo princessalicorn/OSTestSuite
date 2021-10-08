@@ -1,2 +1,8 @@
 # OSTestSuite
-A set of basic tests made to abstractly compare Microkernel and Monolithic Kernel Architectures
+A set of basic tests made to abstractly compare Microkernel and Monolithic Kernel Architectures.
+
+Dependcies:
+GCC
+GNU-COBOL
+Bash
+**NOT YET** SQL
