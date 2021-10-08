@@ -119,7 +119,12 @@ void dbtest() {
   printf("Do you want to conduct database testing? This will likely require a "
          "COBOL compiler!");
   scanf("%c", &contans);
+  if (contans == 'y' || contans == 'Y')
+  {
+    
+  }
 }
+
 int main() {
   char path[MAX_BUF];
   char initans;
