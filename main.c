@@ -4,18 +4,33 @@ Purpose: Abstractly testing operating system performance using various abstract
 metrics in POSIX Version: In Development
 */
 
+#include <arpa/inet.h>
+#include <errno.h>
 #include <libcob.h> //Note I had to add #include <stddef.h> in the header file
+#include <netinet/in.h>
+#include <netinet/ip_icmp.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/socket.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
 
-extern int say(char *hello, char *world);
-
+#ifndef SLEEP_RATE
+#define SLEEP_RATE 1000000 x
+#endif
+#ifndef PORT
+#define PORT 0
+#endif
+#ifndef PKTS
+#define PKTS 64
+#endif
+#ifndef TIMEOUT
+#define TIMEOUT 1
+#endif
 #ifndef PATH // MODIFY THIS TO WHATEVER DIRECTORY YOU WANT THE TESTS TO TAKE IN
 #define PATH "/tmp/"
 #endif // PATH
@@ -23,10 +38,13 @@ extern int say(char *hello, char *world);
 #define MAX_BUF 1024
 #endif // MAX_BUF
 
+extern int say(char *hello, char *world); // CBL stuff
+int pingloop = 1;
+
 void foldertest() {
   /*Nessecary code for this part of the program*/
   FILE *fp;
-  char buf[BUFSIZ];
+  char buf[MAX_BUF];
 
   const char *resultspath = PATH "results.txt";
   snprintf(buf, sizeof(buf), "touch %s", resultspath);
@@ -44,7 +62,7 @@ void foldertest() {
 
   double eltimetest1 = 0.0;
   clock_t begin = clock(); // Do the fun!
-  char dirbuf[BUFSIZ];
+  char dirbuf[MAX_BUF];
   const char *testdir = PATH;
   printf("%s\n", testdir);
   mkdir(testdir, 777); // add ifdef for non linux systems to not include 777
@@ -88,7 +106,7 @@ void foldertest() {
 }
 
 void rwtest() {
-  char buf[BUFSIZ];
+  char buf[MAX_BUF];
   FILE *fp;
   const char *resultspath = PATH "results.txt";
   fp = fopen(resultspath, "a+");
@@ -121,7 +139,7 @@ void rwtest() {
 void dbtest() {
   /*Nessecary code for this part of the program*/
   FILE *fp;
-  char buf[BUFSIZ];
+  char buf[MAX_BUF];
   int ret;
   char hello[6] = "Hello ";
   char world[6] = "World!";
@@ -134,6 +152,31 @@ void dbtest() {
   fp = fopen(resultspath, "w+");
 
   // return ret;
+}
+
+void nettest() {
+  int pipearr[2];
+  char buf[MAX_BUF];
+  FILE *fp;
+  const char *resultspath = PATH "results.txt";
+  fp = fopen(resultspath, "a+");
+
+  pipe(pipearr);
+  double eltimetest4 = 0.0;
+  clock_t begin4 = clock();
+  if (fork() == 0) {
+    dup2(pipearr[1], STDOUT_FILENO);
+    execl("/sbin/ping", "ping", "-c 100", "8.8.8.8", (char *)NULL);
+  } else {
+    wait(NULL);
+    read(pipearr[0], buf, MAX_BUF);
+  }
+  clock_t end4 = clock();
+  eltimetest4 += (double)(end4 - begin4) / CLOCKS_PER_SEC;
+
+  fprintf(fp, "Ping Test (100 C)\n");
+  fprintf(fp, "Elapsed time: %f seconds\n", eltimetest4);
+  fclose(fp);
 }
 
 int main() {
@@ -151,6 +194,7 @@ int main() {
     rwtest();
     printf("Random R/W Test Complete!\n");
     dbtest();
+    nettest();
 
   } else if (initans == 'n' || initans == 'N') {
     return 0;
