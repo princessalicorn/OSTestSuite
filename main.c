@@ -6,7 +6,6 @@ metrics in POSIX Version: In Development
 
 #include <arpa/inet.h>
 #include <errno.h>
-#include <libcob.h> //Note I had to add #include <stddef.h> in the header file
 #include <netinet/in.h>
 #include <netinet/ip_icmp.h>
 #include <stddef.h>
@@ -136,24 +135,6 @@ void rwtest() {
   fprintf(fp, "Elapsed time: %f seconds\n", eltimetest3);
 }
 
-void dbtest() {
-  /*Nessecary code for this part of the program*/
-  FILE *fp;
-  char buf[MAX_BUF];
-  int ret;
-  char hello[6] = "Hello ";
-  char world[6] = "World!";
-
-  cob_init(0, NULL);
-
-  ret = say(hello, world);
-
-  const char *resultspath = PATH "results.txt";
-  fp = fopen(resultspath, "w+");
-
-  // return ret;
-}
-
 void nettest() {
   int pipearr[2];
   char buf[MAX_BUF];
@@ -193,7 +174,6 @@ int main() {
     printf("Folder Writing Test Complete!\n");
     rwtest();
     printf("Random R/W Test Complete!\n");
-    dbtest();
     nettest();
 
   } else if (initans == 'n' || initans == 'N') {
